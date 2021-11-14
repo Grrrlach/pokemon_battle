@@ -1,0 +1,16 @@
+{% extends "base.html.j2"%}
+{% block css %}
+    <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+{% endblock%}
+{% block title%}
+Poke Lookup
+{% endblock %}
+{% block content %}
+<h1>Welcome, Pokemon Trainer!</h1>
+{% if not current_user.is_authenticated %}
+Proceed to our <a class="btn btn-primary" href="{{url_for('auth.login')}}" role="button">login page</a> to continue your journey...
+{% endif %}
+<br>
+
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html.j2' %}
+
+{% block title %}
+Lookup a Pokemon!
+{% endblock %}
+
+{% block content %}
+    {# <div class = "form-title"> #}
+        <h1>Enter the name of a Pokemon:</h1>
+    {# </div> #}
+    <div class = "form-group">
+
+        <form action='{{url_for("main.pokemon")}}' method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.poke_id.label (class = "form-label")}}
+        {{ form.poke_id(class = "form-control") }} <br>
+
+        {{form.submit(class="btn btn-primary form-control")}}
+
+        {# <form method="POST" action="/pokemon">
+        <div class="mb-3">
+            <label for="pokemon" class="form-label">Pokemon Name</label>
+            <input type="text" name="pokemon" class="form-control" id="poke">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+        </form> #}
+
+        
+        {% if pokemon_stats %}
+            <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                <th scope="col">Pokemon Name</th>
+                <th scope="col">HP Base</th>
+                <th scope="col">Defense Base</th>
+                <th scope="col">Attack Base</th>
+                <th scope="col">Picture Link</th>
+                
+                </tr> 
+            </thead>
+            <tbody>
+                
+                    <tr>
+                        <th scope="row">{{pokemon_stats['poke_name'].title()}}</th>
+                        <td>{{pokemon_stats['hp_base']}}</td>
+                        <td>{{pokemon_stats['attack_base']}}</td>
+                        <td>{{pokemon_stats['defense_base']}}</td>    
+                        <td><a href="{{pokemon_stats['front_shiny_sprite']}}"><img src="{{pokemon_stats['front_shiny_sprite']}}" class="img-fluid" alt="shiny"</a></td>
+                        
+                    </tr>
+                
+            </tbody>
+            </table>
+        Gotta Catch 'em All!
+        {% endif %}
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,13 @@
+body{
+    background-size: 100% auto;
+    background-color: #75c7f7;
+}
+div.form-group {
+    margin: auto;
+    width: 90%;
+  }
+
+div.form-title {
+margin: auto;
+width: 90%;
+}
