@@ -1,0 +1,16 @@
+{% extends 'base.html.j2'%}
+
+{% block title %}
+My Trainer's Log
+{% endblock %}
+
+{% block content %}
+<h1>My Posts</h1>
+<hr>
+
+    {% for post in posts %}
+        {% include './includes/_post.html.j2' %}
+    {% endfor %}
+
+
+{% endblock %}

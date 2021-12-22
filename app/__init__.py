@@ -3,7 +3,7 @@ from config import Config
 from flask_login import LoginManager #for logging users in and maintaining a session
 from flask_sqlalchemy import SQLAlchemy #this talk to our database for us
 from flask_migrate import Migrate #Makes altering the Database a lot easier
-
+from flask_moment import Moment
 
 
 # init Login Manager
@@ -19,6 +19,8 @@ db = SQLAlchemy()
 #could be in models, should be, and imported to here
 migrate = Migrate()
 
+moment = Moment()
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -26,6 +28,7 @@ def create_app(config_class=Config):
     login.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
+    moment.init_app(app)
 
     #Register our blueprints with the app
     #local import is solution, otherwise it becomes circular import
@@ -34,5 +37,11 @@ def create_app(config_class=Config):
 
     from . blueprints.auth import bp as auth_bp
     app.register_blueprint(auth_bp)
+
+    from .blueprints.social import bp as social_bp
+    app.register_blueprint(social_bp)
+
+    from .blueprints.api import bp as api_bp
+    app.register_blueprint(api_bp)
     
     return app

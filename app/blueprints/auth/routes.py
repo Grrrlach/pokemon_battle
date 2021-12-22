@@ -17,7 +17,7 @@ def login():
 
         u = User.query.filter_by(email=email).first()
 
-        if u and u.check_hashed_password(password):
+        if u is not None and u.check_hashed_password(password):
             login_user(u)
             #will want to give the user feedback saying successful login
             flash('You have logged in.', 'success')

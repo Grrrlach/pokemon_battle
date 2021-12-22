@@ -5,6 +5,8 @@ Lookup a Pokemon!
 {% endblock %}
 
 {% block content %}
+    
+
     {# <div class = "form-title"> #}
         <h1>Enter the name of a Pokemon:</h1>
     {# </div> #}
@@ -29,12 +31,14 @@ Lookup a Pokemon!
         
         {% if pokemon_stats %}
             <table class="table table-striped table-hover">
+
             <thead>
                 <tr>
                 <th scope="col">Pokemon Name</th>
                 <th scope="col">HP Base</th>
                 <th scope="col">Defense Base</th>
                 <th scope="col">Attack Base</th>
+                <th scope="col">Favorite Move</th>
                 <th scope="col">Picture Link</th>
                 
                 </tr> 
@@ -44,15 +48,55 @@ Lookup a Pokemon!
                     <tr>
                         <th scope="row">{{pokemon_stats['poke_name'].title()}}</th>
                         <td>{{pokemon_stats['hp_base']}}</td>
-                        <td>{{pokemon_stats['attack_base']}}</td>
-                        <td>{{pokemon_stats['defense_base']}}</td>    
+                        <td>{{pokemon_stats['defense']}}</td>
+                        <td>{{pokemon_stats['attack']}}</td> 
+                        <td>{{pokemon_stats['move']}}</td>
                         <td><a href="{{pokemon_stats['front_shiny_sprite']}}"><img src="{{pokemon_stats['front_shiny_sprite']}}" class="img-fluid" alt="shiny"</a></td>
                         
                     </tr>
-                
+                    <tr>
+                        <th>
+                            <a href="/catch/{{pokemon_stats['poke_name']}}" class="btn btn-primary">Gotta catch 'em all!<br><small><small>*click here to catch<br>this pokemon. <br> You may catch<br>up to 5 pokemon.<br><br>You may not<br>"catch 'em all"</small></small></a>
+                        </th>
+                    <tr>          
             </tbody>
             </table>
-        Gotta Catch 'em All!
+        {% endif %}
+    </div>
+    <div class="form-group">
+        {% if my_pokemon %}
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Your pokemon right now:</th>
+                    </tr>
+                </thead>
+                <thead>
+                    <tr>
+                    <th scope="col">Pokemon Name</th>
+                    <th scope="col">HP Base</th>
+                    <th scope="col">Defense Base</th>
+                    <th scope="col">Attack Base</th>
+                    <th scope="col">Favorite Move</th>
+                    <th scope="col">Picture Link</th>
+                    <th scope="col">Release Them?</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for pokemon in my_pokemon %}
+                        <tr>
+                            <td><a href="https://pokeapi.co/api/v2/pokemon/{{pokemon.poke_name}}">{{pokemon.poke_name.title()}}</a></td>
+                            <td>{{pokemon.hit_points}}</td>
+                            <td>{{pokemon.defense}}</td>
+                            <td>{{pokemon.attack}}</td>
+                            <td>{{pokemon.move}}</td>
+                            <td><a href='{{pokemon.image}}'><img src='{{pokemon.image}}' style='width: 20px; height: 20px;'></a></td>
+                            <td><a href="/release/{{pokemon.poke_name}}" class="btn btn-primary">Let it go!</a></td>
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
         {% endif %}
     </div>
 

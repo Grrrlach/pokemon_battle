@@ -11,3 +11,15 @@ div.form-title {
 margin: auto;
 width: 90%;
 }
+
+div.padded{
+  margin: auto;
+  width: 90%;
+  margin-top: 15px;
+}
+
+div.my-card{
+  margin: auto;
+  width: 50%;
+  margin-top: 10px;
+}
