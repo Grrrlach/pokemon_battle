@@ -1,12 +1,14 @@
 from flask import render_template, request, redirect, url_for, flash
 import requests
-from .forms import PokemonForm
+from .forms import *
 from wtforms.validators import EqualTo, DataRequired, ValidationError
 from flask_login import login_user, current_user, logout_user, login_required
 from . import bp as main
 from app import db
 from app.models import Pokemon
 from sqlalchemy import and_
+import time
+import random
 
 @main.route('/', methods = ['GET'])
 def index():
@@ -109,9 +111,128 @@ def release(poke_name):
     flash (f'You have released your {pokemon_name}.', 'warning')
     return redirect(url_for('main.pokemon'))
 
-# @main.route('/battle', methods=['GET', 'POST'])
-# @login_required
-# def battle()
+@main.route('/battle', methods=['GET', 'POST'])
+@login_required
+def battle():
+    form = BattleForm()
+    my_pokemon = Pokemon.query.filter(Pokemon.user_id==current_user.id).all()
+    # return str(my_pokemon)
+    other_pokemon = Pokemon.query.filter(Pokemon.user_id != current_user.id).order_by(Pokemon.user_id.desc())
+    
+    if request.method == "POST":
+        my_pokemon_id = request.form.get('my_pokemon_id')
+        their_pokemon_id = request.form.get('their_pokemon_id')
+        my_one_pokemon = Pokemon.query.filter(Pokemon.id == my_pokemon_id).first()
+        their_one_pokemon = Pokemon.query.filter(Pokemon.id == their_pokemon_id).first()
+        other_user = their_one_pokemon.user_id
+
+
+        my_id_list = []
+        for pokemon in my_pokemon:
+            my_id_list.append(pokemon.id)
+        other_id_list = []
+        for pokemon in other_pokemon:
+            other_id_list.append(pokemon.id)
+
+
+        if my_pokemon_id not in my_id_list:
+            flash ("That isn't one of your pokemon!", "danger")
+            return redirect (url_for('main.battle', my_pokemon = my_pokemon, other_pokemon = other_pokemon))
+
+        elif their_pokemon_id not in other_id_list:
+            flash ("That isn't an available pokemon!", "danger")
+            return redirect (url_for('main.battle'))
+
+        else:
+            flash (f'{my_pokemon.poke_name} uses {their_one_pokemon.move}: {my_pokemon.move_description}', 'warning')
+            time.sleep(1)
+            flash (f'{their_one_pokemon.poke_name} uses {my_pokemon.move}: {their_one_pokemon.move_description}', 'warning')
+            time.sleep(1)
+            flash ('.....')
+            time.sleep(3)
+
+        while True:
+            my_hp = Pokemon.query.filter(Pokemon.user_id == my_pokemon_id).hit_points.all()[0] * random.randint(1,10)
+            my_defense = Pokemon.query.filter(Pokemon.user_id == my_pokemon_id).defense.all()[0] * random.randint(1,10)
+            my_attack = Pokemon.query.filter(Pokemon.user_id == my_pokemon_id).attack.all()[0] * random.randint(1,10)
+            their_hp = Pokemon.query.filter(Pokemon.user_id == their_pokemon_id).hit_points.all()[0] * random.randint(1,10)
+            their_defense = Pokemon.query.filter(Pokemon.user_id == their_pokemon_id).defense.all()[0] * random.randint(1,10)
+            their_attack = Pokemon.query.filter(Pokemon.user_id == their_pokemon_id).attack.all()[0] * random.randint(1,10)
+
+            if their_attack > my_defense:
+                my_hp -= their_attack
+                if my_hp <=0:
+                    flash (f"{their_pokemon_id} wins!!!")
+                    current_user.wins -=1
+                    other_user.wins +=1
+                    return redirect (url_for('main.battle'))
+                else:
+                    continue
+
+            elif my_attack > their_defense:
+                if their_hp <=0:
+                    flash (f"{my_pokemon} wins!!!")
+                    current_user.wins +=1
+                    other_user.wins -=1
+                    return redirect (url_for('main.battle'))
+                else:
+                    continue
+
+            while True:
+                my_hp = Pokemon.query.filter(Pokemon.user_id == my_pokemon_id).hit_points.all()[0] * random.randint(1,10)
+                my_defense = Pokemon.query.filter(Pokemon.user_id == my_pokemon_id).defense.all()[0] * random.randint(1,10)
+                my_attack = Pokemon.query.filter(Pokemon.user_id == my_pokemon_id).attack.all()[0] * random.randint(1,10)
+                their_hp = Pokemon.query.filter(Pokemon.user_id == their_pokemon_id).hit_points.all()[0] * random.randint(1,10)
+                their_defense = Pokemon.query.filter(Pokemon.user_id == their_pokemon_id).defense.all()[0] * random.randint(1,10)
+                their_attack = Pokemon.query.filter(Pokemon.user_id == their_pokemon_id).attack.all()[0] * random.randint(1,10)
+                
+                if my_attack > their_defense and my_defense > their_attack:
+                    flash (f"{my_pokemon} wins!!!")
+                    current_user.wins +=1
+                    other_user.wins -=1
+                    return redirect (url_for('main.battle'))
+                elif their_attack > my_defense and their_defense > my_attack:
+                    flash (f"{their_one_pokemon} wins!!!")
+                    current_user.wins -=1
+                    other_user.wins +=1
+                    return redirect (url_for('main.battle'))
+                else:
+                    continue
+    else:
+
+        return render_template('/battle.html.j2', form=form, my_pokemon = my_pokemon, other_pokemon = other_pokemon)
+
+
+# if method is post:
+    # import time
+    # my_pokemon_hp = hp * random.randint(1,10)
+    # their_pokemon_hp = hp*random.randint(1,10)
+
+    # my_pokemon attack = attack * random.randint(1,10)
+    # their_pokemon attack = attack * random.randint(1,10)
+    # my_pokemon defense = defense * random.randint(1,10)
+    # their_pokemon defense = defense * random.randint(1,10)
+
+    # flash (f'my_pokemon.poke_name uses my_pokemon.move: my_pokemon.move_description', 'warning')
+    # flash (f'{their_pokemon.poke_name} uses {their_pokemon.move}: {their_pokemon.move_description', 'warning'})
+
+    # while True:
+        # if my_pokemon_attack > their_pokemon_defense & my_pokemon_defense>their_pokemon_attack:
+            # time.sleep(2)
+            # flash (f'{my_pokemon.poke_name} wins!!!')
+            # current_user.wins +=1
+            # other user.wins -=1
+            # return redirect(url_for('battle'))
+        # elif my_pokemon_attack<their_pokemon_defense & my_pokemon_defense<their_pokemon_attack:
+            # time.sleep(2)
+            # flash (f'{their_pokemon.poke_name} wins!!!')
+            # current_user.wins -=1
+            # other user.wins +=1
+            # return redirect(url_for('battle'))
+        # elif my_pokemon_attack == their_pokemon_defense or my_pokemon_defense == their_pokemon_attack:
+            # continue
+
+
 # 
 # create my_selected_pokemon
 
@@ -120,17 +241,40 @@ def release(poke_name):
 # display table
 # for pokemon in their pokemon
 # display row
-# change let it go button to select for battle button
-# button creates their_pokemon
 
 #for current user
 # display table
 # for pokemon in my_pokemon
 # display row
-# change let it go button to select for battle button
-
-# display button to submit
+# put form at bottom asking what pokemon of their you want to battle, and what pokemon of yours you want to battle
+# display button to submit form
 
 
 # if method is post:
-# 
+    # import time
+    # my_pokemon_hp = hp * random.randint(1,10)
+    # their_pokemon_hp = hp*random.randint(1,10)
+
+    # my_pokemon attack = attack * random.randint(1,10)
+    # their_pokemon attack = attack * random.randint(1,10)
+    # my_pokemon defense = defense * random.randint(1,10)
+    # their_pokemon defense = defense * random.randint(1,10)
+
+    # flash (f'my_pokemon.poke_name uses my_pokemon.move: my_pokemon.move_description', 'warning')
+    # flash (f'{their_pokemon.poke_name} uses {their_pokemon.move}: {their_pokemon.move_description', 'warning'})
+
+    # while True:
+        # if my_pokemon_attack > their_pokemon_defense & my_pokemon_defense>their_pokemon_attack:
+            # time.sleep(2)
+            # flash (f'{my_pokemon.poke_name} wins!!!')
+            # current_user.wins +=1
+            # other user.wins -=1
+            # return redirect(url_for('battle'))
+        # elif my_pokemon_attack<their_pokemon_defense & my_pokemon_defense<their_pokemon_attack:
+            # time.sleep(2)
+            # flash (f'{their_pokemon.poke_name} wins!!!')
+            # current_user.wins -=1
+            # other user.wins +=1
+            # return redirect(url_for('battle'))
+        # elif my_pokemon_attack == their_pokemon_defense or my_pokemon_defense == their_pokemon_attack:
+            # continue

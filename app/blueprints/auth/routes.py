@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, flash
 import requests
 # from .forms import PokemonForm, 
 from .forms import LoginForm, RegisterForm, PasswordField, EditProfileForm
-from wtforms.validators import EqualTo, DataRequired, ValidationError
+from wtforms.validators import EqualTo, DataRequired, ValidationError, Email
 from app.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from . import bp as auth
@@ -43,7 +43,8 @@ def logout():
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
-    if request.method == 'POST' and form.validate_on_submit():
+    # if request.method == 'POST' and form.validate_on_submit():
+    if request.method == 'POST':
         try:
             new_user_data = {
                 "first_name":form.first_name.data.title(),
@@ -63,6 +64,7 @@ def register():
             error_string = "Beedrills got in our machine! Something went wront with your registration. Come back when we've caught them and patched up!"
             return render_template ('register.html.j2', form = form, error=error_string)
         return redirect(url_for('auth.login'))
+    flash ('Something went wrong. Please check your form carefully and try again.', "danger")
     return render_template('register.html.j2', form = form)
     
 @auth.route('/edit_profile', methods=['GET', "POST"])

@@ -64,6 +64,10 @@ Lookup a Pokemon!
         {% endif %}
     </div>
     <div class="form-group">
+        {% if not my_pokemon %}
+            GO CATCH SOME POKEMON!
+        {% endif %}
+
         {% if my_pokemon %}
             <table class="table table-striped table-hover">
                 <thead>
@@ -93,6 +97,21 @@ Lookup a Pokemon!
                             <td>{{pokemon.move}}</td>
                             <td><a href='{{pokemon.image}}'><img src='{{pokemon.image}}' style='width: 20px; height: 20px;'></a></td>
                             <td><a href="/release/{{pokemon.poke_name}}" class="btn btn-primary">Let it go!</a></td>
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tbody>
+                    {% for pokemon in my_pokemon %}
+                        <tr>
+                            {# <td><a href="https://pokeapi.co/api/v2/pokemon/{{pokemon.poke_name}}">{{pokemon.poke_name.title()}}</a></td>
+                            <td>{{pokemon.hit_points}}</td>
+                            <td>{{pokemon.defense}}</td>
+                            <td>{{pokemon.attack}}</td>
+                            <td>{{pokemon.move}}</td>
+                            <td><a href='{{pokemon.image}}'><img src='{{pokemon.image}}' style='width: 20px; height: 20px;'></a></td>
+                            <td><a href="/release/{{pokemon.poke_name}}" class="btn btn-primary">Let it go!</a></td> #}
 
                         </tr>
                     {% endfor %}
