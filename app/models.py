@@ -28,8 +28,8 @@ class User(UserMixin, db.Model):
         backref=db.backref('followers', lazy='dynamic'),
         lazy='dynamic'
         )
-    wins = db.Column(db.Integer)
-    losses = db.Column(db.Integer)
+    wins = db.Column(db.Integer, default = 0)
+    losses = db.Column(db.Integer, default = 0)
     
     token = db.Column(db.String, index = True, unique=True)
     token_exp = db.Column (db.DateTime)
